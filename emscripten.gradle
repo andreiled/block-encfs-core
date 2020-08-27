@@ -1,0 +1,72 @@
+// Read more at https://docs.gradle.org/current/userguide/native_software.html#sec:crosscompiling_with_gcc
+
+model {
+    platforms {
+        Node_12 {
+//            operatingSystem 'windows' //project.machines.windows.operatingSystemFamily.name
+            architecture 'Node_12'
+        }
+    }
+
+    toolChains {
+//        gcc(Gcc) {
+//            target 'host:x86'
+//            target 'host:x86_64'
+//        }
+        emscripten(Clang) {
+//            def nativeSelect = delegate.metaClass.select
+//            delegate.metaClass.select = { Object... args ->
+//                def toolProvider = nativeSelect(args)
+//
+//                def nativeLinkerFactory = toolProvider.metaClass.createLinker
+//                toolProvider.metaClass.createLinker {
+//                    return new VersionAwareCompiler<T>(compiler, new DefaultCompilerVersion(
+//                            metadataProvider.getCompilerType().getIdentifier(),
+//                            gccMetadata.getComponent().getVendor(),
+//                            gccMetadata.getComponent().getVersion())
+//                    )
+//                }
+//
+//                return toolProvider
+//            }
+
+            path project.property('emscripten.sdk.home')
+            target('host:Node_12') {
+                cCompiler.executable 'emcc.bat'
+                cppCompiler.executable 'em++.bat'
+                assembler.executable 'emar.bat'
+                linker.executable 'em++.bat'
+
+                [ cCompiler, cppCompiler, linker ]*.withArguments { args ->
+                    args << '-s' << 'WASM=0'
+                }
+            }
+        }
+    }
+
+    //  buildTypes {
+    //    release
+    //  }
+
+    //  components {
+    //    myTestExe(NativeExecutableSpec) {
+    //      targetPlatform("GHS_V850")
+    //      targetBuildTypes("release")
+    //      binaries.all {
+    //        cCompiler.args CF_RELEASE //CF_RELEASE is a string with a lot of Compiler Flags, defined before model {}
+    //        assembler.args AF_RELEASE //AF_RELEASE is a string with a lot of Assembler Flags, defined before model {}
+    //        linker.args LD_RELEASE //LF_RELEASE is a string with a lot of Linker Flags, defined before model {}
+    //      } 
+    //      sources {
+    //        c {
+    //          source {
+    //          srcDir "../../source"
+    //          include "**/*.c"
+    //        }
+    //        exportedHeaders {
+    //          srcDir "../../source"
+    //        }
+    //      }
+    //    }
+    //  }
+}
